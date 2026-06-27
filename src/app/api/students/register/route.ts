@@ -1,0 +1,32 @@
+import { NextRequest } from "next/server";
+import { createStudent } from "@/lib/services/studentService";
+import { validateStudentInput } from "@/lib/utils/validation";
+import { apiSuccess, apiError } from "@/lib/utils/response";
+import { connectDB } from "@/lib/db/mongoose";
+
+export async function POST(req: NextRequest) {
+  await connectDB();
+  try {
+    const body = await req.json();
+
+    const errors = validateStudentInput(body);
+    if (errors.length > 0) {
+      return apiError(errors[0], 422);
+    }
+
+    const student = await createStudent({
+      name: String(body.name).trim(),
+      gender: body.gender as "ذكر" | "أنثى",
+      studentPhone: String(body.studentPhone).trim(),
+      parentPhone: String(body.parentPhone).trim(),
+      school: String(body.school).trim(),
+      parentJob: String(body.parentJob).trim(),
+      createdBy: "student",
+    });
+
+    return apiSuccess({ code: student.code, name: student.name }, 201);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "خطأ في تسجيل الطالب.";
+    return apiError(message, 400);
+  }
+}
