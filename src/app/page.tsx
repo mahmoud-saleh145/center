@@ -198,8 +198,8 @@ export default function StudentRegistration() {
                   onChange={handleJobSelectChange}
                 >
                   <option value="" disabled>اختر الوظيفة...</option>
-                  <option value="مهندس برمجيات">مهندس برمجيات</option>
-                  <option value="طبيبة أطفال">طبيبة أطفال</option>
+                  <option value="مهندس برمجيات">مهندس </option>
+                  <option value="طبيبة أطفال"> طبيب</option>
                   <option value="رجل أعمال">رجل أعمال</option>
                   <option value="معلم">معلم</option>
                   <option value="أخرى">أخرى</option>

@@ -2,14 +2,49 @@ import { connectDB } from "@/lib/db/mongoose";
 import Student, { IStudent } from "@/lib/models/Student";
 import Counter from "@/lib/models/Counter";
 
-async function generateStudentCode(): Promise<string> {
+async function generateStudentCode(
+  grade: string,
+  gender: "ذكر" | "أنثى"
+): Promise<string> {
+
+  const primaryPreparatoryGrades = [
+    "3 ابتدائي",
+    "4 ابتدائي",
+    "5 ابتدائي",
+    "6 ابتدائي",
+    "أولى إعدادي",
+    "تانية إعدادي",
+    "تالتة إعدادي",
+  ];
+
+  const secondaryGrades = [
+    "أولى ثانوي",
+    "تانية ثانوي",
+    "تالتة ثانوي",
+  ];
+
+  let prefix: "N" | "K" | "L";
+
+  if (primaryPreparatoryGrades.includes(grade)) {
+    prefix = "N";
+  } else if (secondaryGrades.includes(grade)) {
+    prefix = gender === "ذكر" ? "K" : "L";
+  } else {
+    throw new Error("الصف الدراسي غير صحيح.");
+  }
+
   const counter = await Counter.findOneAndUpdate(
-    { name: "student_code" },
+    { name: prefix },
     { $inc: { seq: 1 } },
-    { new: true, upsert: true }
+    {
+      new: true,
+      upsert: true,
+    }
   );
+
   const num = String(counter.seq).padStart(4, "0");
-  return `ST-${num}`;
+
+  return `${prefix}-${num}`;
 }
 
 export interface CreateStudentDTO {
@@ -46,7 +81,7 @@ export async function createStudent(dto: CreateStudentDTO): Promise<IStudent> {
     throw new Error("هذا الطالب مسجل مسبقاً في النظام.");
   }
 
-  const code = await generateStudentCode();
+  const code = await generateStudentCode(dto.grade, dto.gender);
   const student = new Student({ ...dto, code });
   await student.save();
   return student;
@@ -129,7 +164,14 @@ export async function getStatistics() {
   return { total, males, females, todayCount };
 }
 
-export async function getAllStudentsForExport() {
+export async function getAllStudentsForExport(
+  gender?: "ذكر" | "أنثى"
+) {
   await connectDB();
-  return Student.find().sort("-createdAt").lean();
+
+  return Student.find(
+    gender ? { gender } : {}
+  )
+    .sort("-createdAt")
+    .lean();
 }

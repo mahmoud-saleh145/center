@@ -152,16 +152,42 @@ export default function StudentDashboard() {
   const exportToExcel = async () => {
     setExportLoading(true);
     showToast("جاري تصدير البيانات إلى Excel...", "info");
+
     try {
-      const res = await fetch("/api/admin/students/export");
-      if (!res.ok) { showToast("حدث خطأ أثناء التصدير.", "error"); return; }
+      const params = new URLSearchParams();
+
+      if (genderFilter !== "all") {
+        params.append("gender", genderFilter);
+      }
+
+      const res = await fetch(
+        `/api/admin/students/export?${params.toString()}`
+      );
+
+      if (!res.ok) {
+        showToast("حدث خطأ أثناء التصدير.", "error");
+        return;
+      }
+
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
+
       const a = document.createElement("a");
       a.href = url;
-      a.download = `students_${Date.now()}.xlsx`;
+
+      const name =
+        genderFilter === "ذكر"
+          ? "boys"
+          : genderFilter === "أنثى"
+            ? "girls"
+            : "students";
+
+      a.download = `${name}_${Date.now()}.xlsx`;
+
       a.click();
+
       URL.revokeObjectURL(url);
+
       showToast("تم تصدير الملف بنجاح!", "success");
     } catch {
       showToast("تعذر الاتصال بالخادم.", "error");
