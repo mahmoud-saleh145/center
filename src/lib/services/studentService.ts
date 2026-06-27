@@ -20,6 +20,8 @@ export interface CreateStudentDTO {
   school: string;
   parentJob: string;
   createdBy: "student" | "admin";
+  grade: string;
+  track?: string;
 }
 
 export interface StudentFilters {

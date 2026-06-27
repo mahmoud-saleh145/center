@@ -1,3 +1,24 @@
+const VALID_GRADES = [
+  "3 ابتدائي",
+  "4 ابتدائي",
+  "5 ابتدائي",
+  "6 ابتدائي",
+  "أولى إعدادي",
+  "تانية إعدادي",
+  "تالتة إعدادي",
+  "أولى ثانوي",
+  "تانية ثانوي",
+  "تالتة ثانوي",
+];
+
+const SECONDARY_2_TRACKS = [
+  "مسار الطب و علوم الحياة",
+  "مسار الهندسة و علوم الحاسب",
+  "مسار الأعمال",
+  "مسار الأدب و الفنون",
+];
+
+const SECONDARY_3_TRACKS = ["علمي رياضة", "علمي علوم", "أدبي"];
 const EG_PHONE = /^01[0125]\d{8}$/;
 const QUADRUPLE_NAME = /^\S+(\s+\S+){3,}/;
 
@@ -21,6 +42,26 @@ export function validateStudentInput(body: Record<string, unknown>) {
   }
   if (!body.parentJob || String(body.parentJob).trim().length < 2) {
     errors.push("وظيفة ولي الأمر مطلوبة.");
+  }
+  // Grade validation
+  const grade = String(body.grade ?? "").trim();
+  if (!grade || !VALID_GRADES.includes(grade)) {
+    errors.push("يرجى اختيار الصف الدراسي.");
+  }
+
+  // Track validation — conditional on grade
+  const track = String(body.track ?? "").trim();
+  if (grade === "تانية ثانوي") {
+    if (!track || !SECONDARY_2_TRACKS.includes(track)) {
+      errors.push("يرجى اختيار المسار لطلاب تانية ثانوي.");
+    }
+  } else if (grade === "تالتة ثانوي") {
+    if (!track || !SECONDARY_3_TRACKS.includes(track)) {
+      errors.push("يرجى اختيار الشعبة لطلاب تالتة ثانوي.");
+    }
+  } else if (track) {
+    // Track must be empty for all other grades
+    errors.push("لا يوجد مسار أو شعبة لهذا الصف.");
   }
 
   return errors;

@@ -47,7 +47,9 @@ export async function POST(req: NextRequest) {
       parentPhone: String(body.parentPhone).trim(),
       school: String(body.school).trim(),
       parentJob: String(body.parentJob).trim(),
-      createdBy: "admin",
+      grade: String(body.grade).trim(),
+      track: body.track ? String(body.track).trim() : "",
+      createdBy: "student",
     });
 
     return apiSuccess(student, 201);

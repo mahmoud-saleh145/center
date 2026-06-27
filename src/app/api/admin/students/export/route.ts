@@ -16,6 +16,8 @@ export async function GET(req: NextRequest) {
       "كود الطالب": s.code,
       "الاسم الكامل": s.name,
       الجنس: s.gender,
+      الصف: s.grade,
+      المسار: s.track || "-",
       "هاتف الطالب": s.studentPhone,
       "هاتف ولي الأمر": s.parentPhone,
       المدرسة: s.school,

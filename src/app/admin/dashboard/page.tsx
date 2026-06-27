@@ -13,6 +13,8 @@ interface Student {
   parentPhone: string;
   school: string;
   parentJob: string;
+  grade: string;
+  track?: string;
   createdAt: string;
 }
 
@@ -52,6 +54,15 @@ export default function StudentDashboard() {
 
   const [exportLoading, setExportLoading] = useState(false);
 
+  const GRADE_TRACKS: Record<string, string[]> = {
+    "تانية ثانوي": [
+      "مسار الطب و علوم الحياة",
+      "مسار الهندسة و علوم الحاسب",
+      "مسار الأعمال",
+      "مسار الأدب و الفنون",
+    ],
+    "تالتة ثانوي": ["علمي رياضة", "علمي علوم", "أدبي"],
+  };
   const showToast = (msg: string, type: "success" | "error" | "info" = "success") => {
     const existing = document.getElementById("custom-toast");
     if (existing) existing.remove();
@@ -69,8 +80,8 @@ export default function StudentDashboard() {
     const icon = type === "success"
       ? '<i class="fa-solid fa-circle-check"></i>'
       : type === "error"
-      ? '<i class="fa-solid fa-triangle-exclamation"></i>'
-      : '<i class="fa-solid fa-circle-info"></i>';
+        ? '<i class="fa-solid fa-triangle-exclamation"></i>'
+        : '<i class="fa-solid fa-circle-info"></i>';
     toast.innerHTML = `${icon} <span>${msg}</span>`;
     document.body.appendChild(toast);
     setTimeout(() => {
@@ -201,6 +212,8 @@ export default function StudentDashboard() {
           parentPhone: editingStudent.parentPhone.trim(),
           school: editingStudent.school.trim(),
           parentJob: editingStudent.parentJob.trim(),
+          grade: editingStudent.grade,
+          track: editingStudent.track ?? "",
         }),
       });
       const json = await res.json();
@@ -382,6 +395,8 @@ export default function StudentDashboard() {
                     <th>هاتف ولي الأمر</th>
                     <th>المدرسة</th>
                     <th>وظيفة ولي الأمر</th>
+                    <th>الصف</th>
+                    <th>المسار / الشعبة</th>
                     <th>الإجراءات</th>
                   </tr>
                 </thead>
@@ -395,6 +410,8 @@ export default function StudentDashboard() {
                       <td>{student.parentPhone}</td>
                       <td><div className="student-school">{student.school}</div></td>
                       <td>{student.parentJob}</td>
+                      <td>{student.grade}</td>
+                      <td>{student.track || "-"}</td>
                       <td>
                         <div className="action-buttons">
                           <button className="action-btn btn-edit" title="تعديل" onClick={() => openEditModal(student)}>
@@ -412,7 +429,7 @@ export default function StudentDashboard() {
                   ))}
                   {students.length === 0 && (
                     <tr>
-                      <td colSpan={8} style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)" }}>
+                      <td colSpan={10} style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)" }}>
                         لا توجد نتائج تطابق خيارات البحث الحالية.
                       </td>
                     </tr>
@@ -538,6 +555,58 @@ export default function StudentDashboard() {
                   <i className="fa-solid fa-briefcase modal-input-icon"></i>
                 </div>
               </div>
+              <div className="modal-row">
+                <div className="modal-form-group">
+                  <label className="modal-label">الصف الدراسي</label>
+                  <div className="modal-select-wrapper">
+                    <select
+                      className="modal-select"
+                      required
+                      value={editingStudent.grade}
+                      onChange={(e) => setEditingStudent({
+                        ...editingStudent,
+                        grade: e.target.value,
+                        track: "", // reset track when grade changes
+                      })}
+                    >
+                      <option value="" disabled>اختر الصف...</option>
+                      <option value="3 ابتدائي">3 ابتدائي</option>
+                      <option value="4 ابتدائي">4 ابتدائي</option>
+                      <option value="5 ابتدائي">5 ابتدائي</option>
+                      <option value="6 ابتدائي">6 ابتدائي</option>
+                      <option value="أولى إعدادي">أولى إعدادي</option>
+                      <option value="تانية إعدادي">تانية إعدادي</option>
+                      <option value="تالتة إعدادي">تالتة إعدادي</option>
+                      <option value="أولى ثانوي">أولى ثانوي</option>
+                      <option value="تانية ثانوي">تانية ثانوي</option>
+                      <option value="تالتة ثانوي">تالتة ثانوي</option>
+                    </select>
+                    <i className="fa-solid fa-chevron-down modal-select-arrow"></i>
+                  </div>
+                </div>
+
+                {(GRADE_TRACKS[editingStudent.grade] ?? []).length > 0 && (
+                  <div className="modal-form-group">
+                    <label className="modal-label">
+                      {editingStudent.grade === "تانية ثانوي" ? "المسار" : "الشعبة"}
+                    </label>
+                    <div className="modal-select-wrapper">
+                      <select
+                        className="modal-select"
+                        required
+                        value={editingStudent.track ?? ""}
+                        onChange={(e) => setEditingStudent({ ...editingStudent, track: e.target.value })}
+                      >
+                        <option value="" disabled>اختر...</option>
+                        {(GRADE_TRACKS[editingStudent.grade] ?? []).map((t) => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
+                      <i className="fa-solid fa-chevron-down modal-select-arrow"></i>
+                    </div>
+                  </div>
+                )}
+              </div>
               <div className="modal-actions">
                 <button type="button" className="modal-cancel-btn" onClick={() => setShowEditModal(false)}>
                   <i className="fa-solid fa-xmark"></i><span>إلغاء</span>
@@ -592,6 +661,27 @@ export default function StudentDashboard() {
                   <span className="view-info-value">{viewingStudent.school}</span>
                 </div>
               </div>
+              <div className="view-info-card">
+                <div className="view-info-icon" style={{ backgroundColor: "#fef3c7", color: "#d97706" }}>
+                  <i className="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div className="view-info-content">
+                  <span className="view-info-label">الصف الدراسي</span>
+                  <span className="view-info-value">{viewingStudent.grade}</span>
+                </div>
+              </div>
+
+              {viewingStudent.track && (
+                <div className="view-info-card">
+                  <div className="view-info-icon" style={{ backgroundColor: "#f0fdf4", color: "#16a34a" }}>
+                    <i className="fa-solid fa-code-branch"></i>
+                  </div>
+                  <div className="view-info-content">
+                    <span className="view-info-label">المسار / الشعبة</span>
+                    <span className="view-info-value">{viewingStudent.track}</span>
+                  </div>
+                </div>
+              )}
               <div className="view-info-card">
                 <div className="view-info-icon phone-icon"><i className="fa-regular fa-comment-dots"></i></div>
                 <div className="view-info-content">

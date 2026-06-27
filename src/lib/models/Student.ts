@@ -11,6 +11,8 @@ export interface IStudent extends Document {
   createdBy: "student" | "admin";
   createdAt: Date;
   updatedAt: Date;
+  grade: string;
+  track?: string;
 }
 
 const studentSchema = new Schema<IStudent>(
@@ -59,6 +61,28 @@ const studentSchema = new Schema<IStudent>(
       required: true,
       enum: ["student", "admin"],
       default: "student",
+    },
+    grade: {
+      type: String,
+      required: true,
+      trim: true,
+      enum: [
+        "3 ابتدائي",
+        "4 ابتدائي",
+        "5 ابتدائي",
+        "6 ابتدائي",
+        "أولى إعدادي",
+        "تانية إعدادي",
+        "تالتة إعدادي",
+        "أولى ثانوي",
+        "تانية ثانوي",
+        "تالتة ثانوي",
+      ],
+    },
+    track: {
+      type: String,
+      trim: true,
+      default: "",
     },
   },
   { timestamps: true }

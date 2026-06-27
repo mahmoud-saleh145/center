@@ -12,13 +12,31 @@ export default function StudentRegistration() {
   const [studentPhone, setStudentPhone] = useState("");
   const [studentSchool, setStudentSchool] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [grade, setGrade] = useState("");
+  const [track, setTrack] = useState("");
   // Popup state
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [generatedCode, setGeneratedCode] = useState("");
   const [registeredName, setRegisteredName] = useState("");
   const [copied, setCopied] = useState(false);
 
+  const GRADE_TRACKS: Record<string, string[]> = {
+    "تانية ثانوي": [
+      "مسار الطب و علوم الحياة",
+      "مسار الهندسة و علوم الحاسب",
+      "مسار الأعمال",
+      "مسار الأدب و الفنون",
+    ],
+    "تالتة ثانوي": ["علمي رياضة", "علمي علوم", "أدبي"],
+  };
+
+  const tracksForGrade = GRADE_TRACKS[grade] ?? [];
+  const showTrack = tracksForGrade.length > 0;
+
+  const handleGradeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setGrade(e.target.value);
+    setTrack(""); // reset track whenever grade changes
+  };
   const handleJobSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setParentJob(val);
@@ -45,8 +63,8 @@ export default function StudentRegistration() {
     const icon = type === "success"
       ? '<i class="fa-solid fa-circle-check"></i>'
       : type === "error"
-      ? '<i class="fa-solid fa-triangle-exclamation"></i>'
-      : '<i class="fa-solid fa-circle-info"></i>';
+        ? '<i class="fa-solid fa-triangle-exclamation"></i>'
+        : '<i class="fa-solid fa-circle-info"></i>';
 
     toast.innerHTML = `${icon} <span>${msg}</span>`;
     document.body.appendChild(toast);
@@ -90,6 +108,8 @@ export default function StudentRegistration() {
           parentPhone: parentPhone.trim(),
           school: studentSchool.trim(),
           parentJob: finalParentJob,
+          grade,
+          track,
         }),
       });
 
@@ -129,6 +149,8 @@ export default function StudentRegistration() {
     setStudentSchool("");
     setGeneratedCode("");
     setRegisteredName("");
+    setGrade("");
+    setTrack("");
   };
 
   return (
@@ -272,6 +294,61 @@ export default function StudentRegistration() {
               <i className="fa-solid fa-school input-icon"></i>
             </div>
           </div>
+
+          {/* Grade field */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="student-grade">الصف الدراسي</label>
+            <div className="select-wrapper">
+              <select
+                id="student-grade"
+                className="select-field"
+                required
+                value={grade}
+                onChange={handleGradeChange}
+              >
+                <option value="" disabled>اختر الصف...</option>
+                <option value="3 ابتدائي">3 ابتدائي</option>
+                <option value="4 ابتدائي">4 ابتدائي</option>
+                <option value="5 ابتدائي">5 ابتدائي</option>
+                <option value="6 ابتدائي">6 ابتدائي</option>
+                <option value="أولى إعدادي">أولى إعدادي</option>
+                <option value="تانية إعدادي">تانية إعدادي</option>
+                <option value="تالتة إعدادي">تالتة إعدادي</option>
+                <option value="أولى ثانوي">أولى ثانوي</option>
+                <option value="تانية ثانوي">تانية ثانوي</option>
+                <option value="تالتة ثانوي">تالتة ثانوي</option>
+              </select>
+              <i className="fa-solid fa-graduation-cap input-icon"></i>
+              <i className="fa-solid fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+
+          {/* Track field — only shown for تانية ثانوي and تالتة ثانوي */}
+          {showTrack && (
+            <div className="form-group">
+              <label className="form-label" htmlFor="student-track">
+                {grade === "تانية ثانوي" ? "المسار" : "الشعبة"}
+              </label>
+              <div className="select-wrapper">
+                <select
+                  id="student-track"
+                  className="select-field"
+                  required
+                  value={track}
+                  onChange={(e) => setTrack(e.target.value)}
+                >
+                  <option value="" disabled>
+                    {grade === "تانية ثانوي" ? "اختر المسار..." : "اختر الشعبة..."}
+                  </option>
+                  {tracksForGrade.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+                <i className="fa-solid fa-code-branch input-icon"></i>
+                <i className="fa-solid fa-chevron-down select-arrow"></i>
+              </div>
+            </div>
+          )}
 
           <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? (
