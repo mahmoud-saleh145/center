@@ -67,6 +67,7 @@ body {
     align-items: center;
     padding: 40px 20px;
     position: relative;
+    overflow: hidden;
 }
 
 .register-body::before,
@@ -2057,7 +2058,7 @@ body {
 
 @media (max-width: 768px) {
     .register-card {
-        padding: 24px 16px;
+        padding: 32px 24px;
     }
 
     .form-row {
