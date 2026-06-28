@@ -186,9 +186,9 @@ export default function StudentRegistration() {
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label" htmlFor="parent-job">وظيفة ولي الأمر</label>
+          <div className="form-group">
+            <label className="form-label" htmlFor="parent-job">وظيفة ولي الأمر</label>
+            <div className="form-row">
               <div className="select-wrapper">
                 <select
                   id="parent-job"
@@ -208,7 +208,7 @@ export default function StudentRegistration() {
                 <i className="fa-solid fa-chevron-down select-arrow"></i>
               </div>
               {showCustomJob && (
-                <div className="input-wrapper" style={{ marginTop: "8px" }}>
+                <div className="input-wrapper" >
                   <input
                     type="text"
                     id="parent-job-custom"
@@ -222,27 +222,28 @@ export default function StudentRegistration() {
                 </div>
               )}
             </div>
+          </div>
 
-            <div className="form-group">
-              <label className="form-label">النوع</label>
-              <div className="gender-group">
-                <button
-                  type="button"
-                  className={`gender-option ${gender === "male" ? "male-selected" : ""}`}
-                  onClick={() => setGender("male")}
-                >
-                  <i className="fa-solid fa-mars"></i>
-                  <span>ذكر</span>
-                </button>
-                <button
-                  type="button"
-                  className={`gender-option ${gender === "female" ? "female-selected" : ""}`}
-                  onClick={() => setGender("female")}
-                >
-                  <i className="fa-solid fa-venus"></i>
-                  <span>أنثى</span>
-                </button>
-              </div>
+
+          <div className="form-group">
+            <label className="form-label">النوع</label>
+            <div className="gender-group">
+              <button
+                type="button"
+                className={`gender-option ${gender === "male" ? "male-selected" : ""}`}
+                onClick={() => setGender("male")}
+              >
+                <i className="fa-solid fa-mars"></i>
+                <span>ذكر</span>
+              </button>
+              <button
+                type="button"
+                className={`gender-option ${gender === "female" ? "female-selected" : ""}`}
+                onClick={() => setGender("female")}
+              >
+                <i className="fa-solid fa-venus"></i>
+                <span>أنثى</span>
+              </button>
             </div>
           </div>
 
