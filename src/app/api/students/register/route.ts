@@ -2,10 +2,9 @@ import { NextRequest } from "next/server";
 import { createStudent } from "@/lib/services/studentService";
 import { validateStudentInput } from "@/lib/utils/validation";
 import { apiSuccess, apiError } from "@/lib/utils/response";
-import { connectDB } from "@/lib/db/mongoose";
+import { Grade } from "@/lib/models/Student";
 
 export async function POST(req: NextRequest) {
-  await connectDB();
   try {
     const body = await req.json();
 
@@ -17,12 +16,12 @@ export async function POST(req: NextRequest) {
     const student = await createStudent({
       name: String(body.name).trim(),
       gender: body.gender as "ذكر" | "أنثى",
+      grade: String(body.grade).trim() as Grade,
+      track: body.track ? String(body.track).trim() : "",
       studentPhone: String(body.studentPhone).trim(),
       parentPhone: String(body.parentPhone).trim(),
       school: String(body.school).trim(),
       parentJob: String(body.parentJob).trim(),
-      grade: String(body.grade).trim(),
-      track: body.track ? String(body.track).trim() : "",
       createdBy: "student",
     });
 

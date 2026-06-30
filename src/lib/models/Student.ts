@@ -1,9 +1,56 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
+// ---------------------------------------------------------------------------
+// Grade constants — single source of truth
+// ---------------------------------------------------------------------------
+export const SECONDARY_GRADES = [
+  "أولى ثانوي",
+  "تانية ثانوي",
+  "تالتة ثانوي",
+] as const;
+
+export const NON_SECONDARY_GRADES = [
+  "3 ابتدائي",
+  "4 ابتدائي",
+  "5 ابتدائي",
+  "6 ابتدائي",
+  "أولى إعدادي",
+  "تانية إعدادي",
+  "تالتة إعدادي",
+] as const;
+
+export const ALL_GRADES = [...NON_SECONDARY_GRADES, ...SECONDARY_GRADES] as const;
+
+export type Grade = (typeof ALL_GRADES)[number];
+
+// ---------------------------------------------------------------------------
+// Track constants — only relevant for two specific grades
+// ---------------------------------------------------------------------------
+export const SECONDARY_2_TRACKS = [
+  "مسار الطب و علوم الحياة",
+  "مسار الهندسة و علوم الحاسب",
+  "مسار الأعمال",
+  "مسار الأدب و الفنون",
+] as const;
+
+export const SECONDARY_3_TRACKS = [
+  "علمي رياضة",
+  "علمي علوم",
+  "أدبي",
+] as const;
+
+// Grades that require a track selection
+export const GRADES_WITH_TRACK = ["تانية ثانوي", "تالتة ثانوي"] as const;
+
+// ---------------------------------------------------------------------------
+// IStudent interface
+// ---------------------------------------------------------------------------
 export interface IStudent extends Document {
   code: string;
   name: string;
   gender: "ذكر" | "أنثى";
+  grade: Grade;
+  track: string; // "" for grades that have no track; required value for تانية/تالتة ثانوي
   studentPhone: string;
   parentPhone: string;
   school: string;
@@ -11,10 +58,11 @@ export interface IStudent extends Document {
   createdBy: "student" | "admin";
   createdAt: Date;
   updatedAt: Date;
-  grade: string;
-  track?: string;
 }
 
+// ---------------------------------------------------------------------------
+// Mongoose schema
+// ---------------------------------------------------------------------------
 const studentSchema = new Schema<IStudent>(
   {
     code: {
@@ -33,6 +81,20 @@ const studentSchema = new Schema<IStudent>(
       type: String,
       required: true,
       enum: ["ذكر", "أنثى"],
+    },
+    grade: {
+      type: String,
+      required: true,
+      trim: true,
+      enum: [...ALL_GRADES],
+    },
+    track: {
+      type: String,
+      trim: true,
+      default: "",
+      // Not required at schema level — conditional requirement is
+      // enforced in the service layer and validation utility so that
+      // grades without tracks can correctly store an empty string.
     },
     studentPhone: {
       type: String,
@@ -61,28 +123,6 @@ const studentSchema = new Schema<IStudent>(
       required: true,
       enum: ["student", "admin"],
       default: "student",
-    },
-    grade: {
-      type: String,
-      required: true,
-      trim: true,
-      enum: [
-        "3 ابتدائي",
-        "4 ابتدائي",
-        "5 ابتدائي",
-        "6 ابتدائي",
-        "أولى إعدادي",
-        "تانية إعدادي",
-        "تالتة إعدادي",
-        "أولى ثانوي",
-        "تانية ثانوي",
-        "تالتة ثانوي",
-      ],
-    },
-    track: {
-      type: String,
-      trim: true,
-      default: "",
     },
   },
   { timestamps: true }

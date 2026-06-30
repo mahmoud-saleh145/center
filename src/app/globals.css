@@ -2124,3 +2124,1096 @@ body {
         padding: 36px 28px;
     }
 }
+
+/* ==========================================================================
+   STUDENT ACCOUNT PAGE
+   ========================================================================== */
+
+/* ── Page wrapper ── */
+.student-page-body {
+    min-height: 100vh;
+    background-color: #f3f5f9;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Top Navigation Bar ── */
+.student-navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+.student-navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.student-navbar-logo-box {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--bright-blue));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 18px;
+    box-shadow: 0 4px 10px rgba(88, 32, 204, 0.2);
+}
+
+.student-navbar-brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.student-navbar-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--royal-blue);
+    line-height: 1.1;
+}
+
+.student-navbar-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.student-navbar-links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-grow: 1;
+}
+
+.student-nav-item {
+    position: relative;
+}
+
+.student-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all var(--transition-speed);
+    position: relative;
+}
+
+.student-nav-link i:first-child {
+    font-size: 16px;
+}
+
+.student-nav-link:hover {
+    background-color: #f1f5f9;
+    color: var(--text-main);
+}
+
+/* Active nav item */
+.student-nav-active .student-nav-link {
+    background-color: #eff2fe;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* Locked nav items — greyed out, cursor blocked */
+.student-nav-locked .student-nav-link {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.student-nav-locked .student-nav-link:hover {
+    background-color: #f8fafc;
+    color: var(--text-muted);
+}
+
+.student-nav-lock-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    background-color: #e2e8f0;
+    border-radius: 6px;
+    padding: 2px 5px;
+    margin-right: 2px;
+}
+
+.student-navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: auto;
+    margin-left: 0;
+}
+
+.student-navbar-icon-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background-color: #f1f5f9;
+    color: var(--text-muted);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+}
+
+.student-navbar-icon-btn:hover {
+    background-color: #e2e8f0;
+    color: var(--text-main);
+}
+
+.student-navbar-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: var(--red-bg);
+    color: var(--red-color);
+    font-size: 16px;
+    text-decoration: none;
+    transition: all var(--transition-speed);
+    transform: scaleX(-1);
+    /* RTL logout icon flip, matches admin pages */
+}
+
+.student-navbar-back-btn:hover {
+    background-color: var(--red-color);
+    color: #ffffff;
+}
+
+/* ── Main area ── */
+.student-main {
+    flex-grow: 1;
+    padding: 32px;
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* ── Loading / error state ── */
+.student-loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 80px 20px;
+    color: var(--text-muted);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.student-loading-state i {
+    font-size: 24px;
+}
+
+/* ── Welcome Banner ── */
+.student-welcome-banner {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--bright-blue) 100%);
+    border-radius: 24px;
+    padding: 40px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(88, 32, 204, 0.25);
+}
+
+/* Subtle background pattern on the banner */
+.student-welcome-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+    background-size: 22px 22px;
+    pointer-events: none;
+}
+
+.student-welcome-text {
+    position: relative;
+    z-index: 1;
+}
+
+.student-welcome-sub {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 6px;
+}
+
+.student-welcome-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 12px;
+}
+
+.student-welcome-highlight {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 2px 10px;
+}
+
+.student-welcome-greeting {
+    font-size: 18px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 10px;
+}
+
+.student-welcome-desc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 500;
+    max-width: 380px;
+    line-height: 1.7;
+}
+
+/* Decorative illustration */
+.student-welcome-illustration {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.student-illustration-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.student-illustration-circle--outer {
+    width: 160px;
+    height: 160px;
+    top: 0;
+    left: 0;
+}
+
+.student-illustration-circle--inner {
+    width: 110px;
+    height: 110px;
+    top: 25px;
+    left: 25px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.student-illustration-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 56px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Content grid ── */
+.student-content-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
+}
+
+/* Code card spans two rows, profile card spans 3 columns */
+.student-code-card {
+    grid-row: 1 / 3;
+}
+
+.student-profile-card {
+    grid-column: 2 / 5;
+}
+
+/* ── Student Code Card ── */
+.student-code-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-top: 4px solid var(--primary-color);
+}
+
+.student-code-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.student-code-icon-box {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, var(--primary-color), var(--bright-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px rgba(88, 32, 204, 0.25);
+}
+
+.student-code-card-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--royal-blue);
+}
+
+.student-code-card-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.student-code-display {
+    background: linear-gradient(135deg, #eff2fe, var(--purple-bg));
+    border: 2px solid rgba(88, 32, 204, 0.15);
+    border-radius: 16px;
+    padding: 24px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.student-code-value {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--primary-color);
+    letter-spacing: 4px;
+    direction: ltr;
+    font-variant-numeric: tabular-nums;
+}
+
+.student-code-copy-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    background-color: var(--primary-color);
+    color: #ffffff;
+    font-family: var(--primary-font);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(88, 32, 204, 0.2);
+    transition: all var(--transition-speed);
+}
+
+.student-code-copy-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(88, 32, 204, 0.3);
+}
+
+.student-code-copy-btn--copied {
+    background-color: var(--teal-color) !important;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25) !important;
+    transform: none !important;
+}
+
+.student-code-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    line-height: 1.6;
+    background-color: #fafbfc;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+
+.student-code-hint i {
+    color: var(--primary-color);
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* ── Profile Card ── */
+.student-profile-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-top: 4px solid var(--bright-blue);
+}
+
+.student-profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.student-profile-avatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--primary-color), var(--bright-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 28px;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(88, 32, 204, 0.22);
+}
+
+.student-profile-avatar--female {
+    background: linear-gradient(135deg, var(--teal-color), #0ea5e9);
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.22);
+}
+
+.student-profile-hero-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.student-profile-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--royal-blue);
+    line-height: 1.2;
+}
+
+.student-profile-grade-badge {
+    display: inline-block;
+    background-color: var(--accent-blue-bg);
+    color: var(--bright-blue);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(37, 99, 235, 0.15);
+}
+
+/* Info rows grid */
+.student-profile-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.student-profile-info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background-color: #fafbfc;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: background-color var(--transition-speed);
+}
+
+.student-profile-info-row:hover {
+    background-color: #f1f5f9;
+}
+
+.student-profile-info-row--full {
+    grid-column: 1 / -1;
+}
+
+.student-profile-info-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.student-profile-info-icon.gender {
+    background-color: var(--purple-bg);
+    color: var(--purple-color);
+}
+
+.student-profile-info-icon.school {
+    background-color: var(--accent-blue-bg);
+    color: var(--bright-blue);
+}
+
+.student-profile-info-icon.phone {
+    background-color: var(--teal-bg);
+    color: var(--teal-color);
+}
+
+.student-profile-info-icon.parent {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.student-profile-info-icon.job {
+    background-color: var(--red-bg);
+    color: var(--red-color);
+}
+
+.student-profile-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.student-profile-info-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.student-profile-info-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.student-profile-joined {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding-top: 4px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.student-profile-joined i {
+    color: var(--teal-color);
+}
+
+/* ── Locked Feature Cards ── */
+.student-locked-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 24px 20px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0.8;
+    transition: opacity var(--transition-speed);
+}
+
+.student-locked-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(45deg,
+            transparent,
+            transparent 8px,
+            rgba(0, 0, 0, 0.012) 8px,
+            rgba(0, 0, 0, 0.012) 9px);
+    pointer-events: none;
+}
+
+.student-locked-card:hover {
+    opacity: 0.9;
+}
+
+.student-locked-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.student-locked-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.student-locked-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.student-locked-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #f1f5f9;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    margin-top: 4px;
+}
+
+/* ==========================================================================
+   STUDENT PAGE — RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1100px) {
+    .student-content-grid {
+        grid-template-columns: 300px 1fr 1fr;
+    }
+
+    .student-profile-card {
+        grid-column: 2 / 4;
+    }
+
+    .student-locked-card:last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 900px) {
+    .student-content-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: unset;
+    }
+
+    .student-code-card {
+        grid-row: unset;
+        grid-column: 1 / -1;
+    }
+
+    .student-profile-card {
+        grid-column: 1 / -1;
+    }
+
+    .student-welcome-banner {
+        padding: 32px 32px;
+    }
+
+    .student-welcome-title {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 768px) {
+    .student-navbar {
+        padding: 0 16px;
+        gap: 16px;
+    }
+
+    .student-navbar-links {
+        gap: 2px;
+    }
+
+    .student-nav-link {
+        padding: 8px 10px;
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    .student-nav-link span {
+        display: none;
+        /* Icon only on small screens */
+    }
+
+    .student-nav-lock-badge {
+        display: none;
+    }
+
+    .student-main {
+        padding: 20px 16px;
+        gap: 20px;
+    }
+
+    .student-welcome-banner {
+        padding: 28px 24px;
+        flex-direction: column;
+        text-align: center;
+        align-items: flex-start;
+    }
+
+    .student-welcome-illustration {
+        display: none;
+    }
+
+    .student-welcome-desc {
+        max-width: 100%;
+    }
+
+    .student-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .student-profile-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .student-profile-info-row--full {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .student-welcome-banner {
+        padding: 24px 20px;
+        border-radius: 16px;
+    }
+
+    .student-welcome-title {
+        font-size: 22px;
+    }
+
+    .student-welcome-greeting {
+        font-size: 16px;
+    }
+
+    .student-code-value {
+        font-size: 34px;
+        letter-spacing: 3px;
+    }
+
+    .student-code-card,
+    .student-profile-card,
+    .student-locked-card {
+        border-radius: 16px;
+        padding: 20px 16px;
+    }
+
+    .student-navbar-brand-text {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   STUDENT LOGIN PAGE
+   ========================================================================== */
+
+.student-login-body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 50%, #ede9fe 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    position: relative;
+    gap: 28px;
+}
+
+/* Logos row above the card */
+.student-login-logos {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.student-login-logo-img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    background-color: #ffffff;
+    border-radius: 18px;
+    padding: 8px;
+    box-shadow: 0 8px 20px rgba(88, 32, 204, 0.12);
+}
+
+/* Card */
+.student-login-card {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 520px;
+    border-radius: 24px;
+    padding: 40px 44px;
+    box-shadow: 0 20px 50px rgba(88, 32, 204, 0.12), 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.student-login-card-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.student-login-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--royal-blue);
+    margin-bottom: 8px;
+}
+
+.student-login-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.student-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.student-login-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.student-login-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.student-login-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.student-login-input {
+    width: 100%;
+    padding: 15px 46px 15px 16px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    font-family: var(--primary-font);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-main);
+    background-color: #ffffff;
+    transition: all var(--transition-speed);
+}
+
+.student-login-input::placeholder {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.student-login-input:focus {
+    outline: none;
+    border-color: var(--bright-blue);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.student-login-input-icon {
+    position: absolute;
+    right: 16px;
+    font-size: 16px;
+    color: #94a3b8;
+    pointer-events: none;
+    transition: color var(--transition-speed);
+}
+
+.student-login-input:focus~.student-login-input-icon {
+    color: var(--bright-blue);
+}
+
+.student-login-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background-color: var(--red-bg);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 12px;
+    color: var(--red-color);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.student-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    margin-top: 4px;
+    background: linear-gradient(135deg, var(--bright-blue), var(--primary-color));
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    font-family: var(--primary-font);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(88, 32, 204, 0.25);
+    transition: all var(--transition-speed);
+}
+
+.student-login-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(88, 32, 204, 0.32);
+}
+
+.student-login-btn:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+.student-login-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background-color: var(--accent-blue-bg);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--royal-blue);
+    font-weight: 500;
+    line-height: 1.7;
+}
+
+.student-login-note i {
+    color: var(--bright-blue);
+    font-size: 14px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.student-login-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 24px 0 16px;
+}
+
+.student-login-help {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.student-login-help-link {
+    color: var(--primary-color);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.student-login-help-link:hover {
+    text-decoration: underline;
+}
+
+.student-login-footer {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.student-login-back {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+.student-login-back:hover {
+    color: var(--primary-color);
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+    .student-login-card {
+        padding: 32px 24px;
+        border-radius: 20px;
+    }
+
+    .student-login-logo-img {
+        width: 56px;
+        height: 56px;
+    }
+
+    .student-login-title {
+        font-size: 20px;
+    }
+
+    .student-login-back {
+        position: static;
+        margin-top: -8px;
+    }
+
+    .student-login-body {
+        padding: 32px 16px;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 380px) {
+    .student-login-card {
+        padding: 24px 16px;
+    }
+
+    .student-login-input {
+        padding: 13px 42px 13px 14px;
+        font-size: 14px;
+    }
+}
+
+/* Button-element reset for the logout button reusing .student-navbar-back-btn */
+button.student-navbar-back-btn {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+a {
+    text-decoration: none;
+}

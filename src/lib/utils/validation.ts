@@ -1,66 +1,68 @@
-const VALID_GRADES = [
-  "3 ابتدائي",
-  "4 ابتدائي",
-  "5 ابتدائي",
-  "6 ابتدائي",
-  "أولى إعدادي",
-  "تانية إعدادي",
-  "تالتة إعدادي",
-  "أولى ثانوي",
-  "تانية ثانوي",
-  "تالتة ثانوي",
-];
+import {
+  ALL_GRADES,
+  SECONDARY_2_TRACKS,
+  SECONDARY_3_TRACKS,
+} from "@/lib/models/Student";
 
-const SECONDARY_2_TRACKS = [
-  "مسار الطب و علوم الحياة",
-  "مسار الهندسة و علوم الحاسب",
-  "مسار الأعمال",
-  "مسار الأدب و الفنون",
-];
-
-const SECONDARY_3_TRACKS = ["علمي رياضة", "علمي علوم", "أدبي"];
 const EG_PHONE = /^01[0125]\d{8}$/;
 const QUADRUPLE_NAME = /^\S+(\s+\S+){3,}/;
+
+const VALID_GRADES = new Set<string>(ALL_GRADES);
+const S2_TRACKS = new Set<string>(SECONDARY_2_TRACKS);
+const S3_TRACKS = new Set<string>(SECONDARY_3_TRACKS);
 
 export function validateStudentInput(body: Record<string, unknown>) {
   const errors: string[] = [];
 
+  // Name — at least 4 words
   if (!body.name || !QUADRUPLE_NAME.test(String(body.name).trim())) {
     errors.push("يرجى إدخال الاسم رباعياً على الأقل (4 كلمات).");
   }
+
+  // Gender
   if (!body.gender || !["ذكر", "أنثى"].includes(String(body.gender))) {
     errors.push("الجنس غير صحيح.");
   }
+
+  // Student phone
   if (!body.studentPhone || !EG_PHONE.test(String(body.studentPhone).trim())) {
     errors.push("رقم هاتف الطالب غير صحيح.");
   }
+
+  // Parent phone
   if (!body.parentPhone || !EG_PHONE.test(String(body.parentPhone).trim())) {
     errors.push("رقم هاتف ولي الأمر غير صحيح.");
   }
+
+  // School
   if (!body.school || String(body.school).trim().length < 2) {
     errors.push("اسم المدرسة مطلوب.");
   }
+
+  // Parent job
   if (!body.parentJob || String(body.parentJob).trim().length < 2) {
     errors.push("وظيفة ولي الأمر مطلوبة.");
   }
-  // Grade validation
+
+  // Grade — required, must be one of the 10 defined values
   const grade = String(body.grade ?? "").trim();
-  if (!grade || !VALID_GRADES.includes(grade)) {
+  if (!grade || !VALID_GRADES.has(grade)) {
     errors.push("يرجى اختيار الصف الدراسي.");
   }
 
-  // Track validation — conditional on grade
+  // Track — conditional on grade
   const track = String(body.track ?? "").trim();
+
   if (grade === "تانية ثانوي") {
-    if (!track || !SECONDARY_2_TRACKS.includes(track)) {
+    if (!track || !S2_TRACKS.has(track)) {
       errors.push("يرجى اختيار المسار لطلاب تانية ثانوي.");
     }
   } else if (grade === "تالتة ثانوي") {
-    if (!track || !SECONDARY_3_TRACKS.includes(track)) {
+    if (!track || !S3_TRACKS.has(track)) {
       errors.push("يرجى اختيار الشعبة لطلاب تالتة ثانوي.");
     }
   } else if (track) {
-    // Track must be empty for all other grades
+    // All other grades must NOT have a track
     errors.push("لا يوجد مسار أو شعبة لهذا الصف.");
   }
 

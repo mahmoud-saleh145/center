@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
 
 export default function StudentRegistration() {
@@ -198,8 +199,8 @@ export default function StudentRegistration() {
                   onChange={handleJobSelectChange}
                 >
                   <option value="" disabled>اختر الوظيفة...</option>
-                  <option value="مهندس برمجيات">مهندس </option>
-                  <option value="طبيبة أطفال"> طبيب</option>
+                  <option value="مهندس">مهندس </option>
+                  <option value="طبيبة"> طبيب</option>
                   <option value="رجل أعمال">رجل أعمال</option>
                   <option value="معلم">معلم</option>
                   <option value="أخرى">أخرى</option>
@@ -359,11 +360,27 @@ export default function StudentRegistration() {
             )}
           </button>
         </form>
+        <Link
+          href="/student/login"
+
+          style={{ marginTop: "12px", color: "#5820cc", textDecoration: "underline", textAlign: "center", display: "block" }}
+        >
+          <span>تسجيل الدخول</span>
+        </Link>
       </div>
 
       {showSuccessPopup && (
         <div className="popup-overlay" style={{ display: "flex" }}>
           <div className="popup-card">
+            <div>
+              <button
+                type="button"
+                className="popup-close-btn"
+                onClick={resetForm}
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
             <div className="popup-check-icon">
               <i className="fa-solid fa-circle-check"></i>
             </div>
@@ -393,11 +410,28 @@ export default function StudentRegistration() {
             <button
               type="button"
               className="popup-btn"
-              style={{ marginTop: "12px", backgroundColor: "#5820cc" }}
-              onClick={resetForm}
+              onClick={() => {
+                const phone = studentPhone.replace(/^0/, "20");
+
+                const message = `مرحباً *${registeredName}* \n\nكود الطالب الخاص بك هو: *${generatedCode}*`;
+
+                const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+                window.open(whatsappUrl, "_blank");
+              }}
+              style={{ marginTop: "12px", backgroundColor: "#25D366" }}
             >
-              <span>تسجيل طالب جديد</span>
+              <i className="fa-brands fa-whatsapp"></i>
+              <span>إرسال الكود عبر واتساب</span>
             </button>
+            <Link
+              href="/student/login"
+              type="button"
+              className="popup-btn"
+              style={{ marginTop: "12px", backgroundColor: "#5820cc" }}
+            >
+              <span>تسجيل الدخول</span>
+            </Link>
           </div>
         </div>
       )}

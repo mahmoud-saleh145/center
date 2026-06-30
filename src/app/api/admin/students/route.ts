@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/middleware/auth";
-import {
-  getStudents,
-  createStudent,
-} from "@/lib/services/studentService";
+import { getStudents, createStudent, } from "@/lib/services/studentService";
 import { validateStudentInput } from "@/lib/utils/validation";
 import { apiSuccess, apiError } from "@/lib/utils/response";
-import { connectDB } from "@/lib/db/mongoose";
+import { Grade } from "@/lib/models/Student";
 
 export async function GET(req: NextRequest) {
-  await connectDB();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
@@ -30,7 +26,6 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  await connectDB();
   const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
@@ -47,7 +42,7 @@ export async function POST(req: NextRequest) {
       parentPhone: String(body.parentPhone).trim(),
       school: String(body.school).trim(),
       parentJob: String(body.parentJob).trim(),
-      grade: String(body.grade).trim(),
+      grade: String(body.grade).trim() as Grade,
       track: body.track ? String(body.track).trim() : "",
       createdBy: "student",
     });

@@ -1,62 +1,59 @@
 import { connectDB } from "@/lib/db/mongoose";
-import Student, { IStudent } from "@/lib/models/Student";
+import Student, { IStudent, Grade } from "@/lib/models/Student";
 import Counter from "@/lib/models/Counter";
 
-async function generateStudentCode(
-  grade: string,
-  gender: "ذكر" | "أنثى"
-): Promise<string> {
+// ---------------------------------------------------------------------------
+// Universal student code generation — A0001 … A9999 → B0001 … B9999 → …
+//
+// One MongoDB counter document named "student_global" tracks the total
+// number of students ever created.  Each atomic increment gives a unique
+// position n (1-based).  That position maps to:
+//
+//   letter index  = Math.floor((n - 1) / 9999)   → 0=A, 1=B, 2=C …
+//   number within = ((n - 1) % 9999) + 1          → 1 … 9999
+//
+// Examples:
+//   n=1    → A0001       n=9999  → A9999
+//   n=10000 → B0001      n=19998 → B9999
+//   n=19999 → C0001
+//
+// Atomicity: findOneAndUpdate with $inc is a single MongoDB operation,
+// so concurrent requests always receive different values.
+// ---------------------------------------------------------------------------
 
-  const primaryPreparatoryGrades = [
-    "3 ابتدائي",
-    "4 ابتدائي",
-    "5 ابتدائي",
-    "6 ابتدائي",
-    "أولى إعدادي",
-    "تانية إعدادي",
-    "تالتة إعدادي",
-  ];
+const COUNTER_NAME = "student_global";
+const CODES_PER_LETTER = 9999;
 
-  const secondaryGrades = [
-    "أولى ثانوي",
-    "تانية ثانوي",
-    "تالتة ثانوي",
-  ];
-
-  let prefix: "N" | "K" | "L";
-
-  if (primaryPreparatoryGrades.includes(grade)) {
-    prefix = "N";
-  } else if (secondaryGrades.includes(grade)) {
-    prefix = gender === "ذكر" ? "K" : "L";
-  } else {
-    throw new Error("الصف الدراسي غير صحيح.");
-  }
-
+async function generateStudentCode(): Promise<string> {
   const counter = await Counter.findOneAndUpdate(
-    { name: prefix },
+    { name: COUNTER_NAME },
     { $inc: { seq: 1 } },
-    {
-      new: true,
-      upsert: true,
-    }
+    { new: true, upsert: true }
   );
 
-  const num = String(counter.seq).padStart(4, "0");
+  const n = counter.seq; // 1-based position
+  const letterIndex = Math.floor((n - 1) / CODES_PER_LETTER);
+  const number = ((n - 1) % CODES_PER_LETTER) + 1;
 
-  return `${prefix}-${num}`;
+  const letter = String.fromCharCode(65 + letterIndex); // 65 = 'A'
+  const paddedNumber = String(number).padStart(4, "0");
+
+  return `${letter}${paddedNumber}`;
 }
 
+// ---------------------------------------------------------------------------
+// DTO
+// ---------------------------------------------------------------------------
 export interface CreateStudentDTO {
   name: string;
   gender: "ذكر" | "أنثى";
+  grade: Grade;
+  track: string; // "" for grades without a track
   studentPhone: string;
   parentPhone: string;
   school: string;
   parentJob: string;
   createdBy: "student" | "admin";
-  grade: string;
-  track?: string;
 }
 
 export interface StudentFilters {
@@ -67,30 +64,38 @@ export interface StudentFilters {
   sort?: string;
 }
 
+// ---------------------------------------------------------------------------
+// Student creation
+// ---------------------------------------------------------------------------
 export async function createStudent(dto: CreateStudentDTO): Promise<IStudent> {
   await connectDB();
 
-  // Prevent duplicate by phone
+  // Prevent duplicate registration by phone number
   // const existing = await Student.findOne({
   //   $or: [
   //     { studentPhone: dto.studentPhone },
   //     { parentPhone: dto.parentPhone, name: dto.name },
+  //     { parentPhone: dto.parentPhone, name: dto.name },
   //   ],
   // });
-  const existing = await Student.findOne({
-    name: dto.name,
-  });
 
+  const name = dto.name.trim();
+  const existing = await Student.findOne({
+    name: { $regex: `^${name}$`, $options: "i" }
+  });
   if (existing) {
     throw new Error("هذا الطالب مسجل مسبقاً في النظام.");
   }
 
-  const code = await generateStudentCode(dto.grade, dto.gender);
+  const code = await generateStudentCode();
   const student = new Student({ ...dto, code });
   await student.save();
   return student;
 }
 
+// ---------------------------------------------------------------------------
+// CRUD
+// ---------------------------------------------------------------------------
 export async function getStudents(filters: StudentFilters) {
   await connectDB();
 
