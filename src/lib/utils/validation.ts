@@ -1,8 +1,4 @@
-import {
-  ALL_GRADES,
-  SECONDARY_2_TRACKS,
-  SECONDARY_3_TRACKS,
-} from "@/lib/models/Student";
+import { ALL_GRADES, SECONDARY_2_TRACKS, SECONDARY_3_TRACKS } from "../constants/grades";
 
 const EG_PHONE = /^01[0125]\d{8}$/;
 const QUADRUPLE_NAME = /^\S+(\s+\S+){3,}/;

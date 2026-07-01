@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface StudentProfile {
@@ -13,6 +13,13 @@ interface StudentProfile {
   parentPhone: string;
   school: string;
   parentJob: string;
+  createdAt: string;
+}
+
+interface Schedule {
+  _id: string;
+  grade: string;
+  imageUrl: string;
   createdAt: string;
 }
 
@@ -67,6 +74,10 @@ export default function StudentAccountPage() {
   const [student, setStudent] = useState<StudentProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [schedOpen, setSchedOpen] = useState(false);
+  const [viewerImage, setViewerImage] = useState<string>("");
+  const [viewerZoom, setViewerZoom] = useState(1);
 
   useEffect(() => {
     fetch("/api/student/me")
@@ -85,6 +96,16 @@ export default function StudentAccountPage() {
     // showToast/router are stable — safe to omit from deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Fetch schedules for the student's grade (only after student data loads)
+  useEffect(() => {
+    if (!student) return;
+    fetch("/api/student/schedules")
+      .then(r => r.json())
+      .then(json => { if (json.success) setSchedules(json.data); })
+      .catch(() => { });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [student]);
 
   const handleLogout = async () => {
     await fetch("/api/student/logout", { method: "POST" });
@@ -112,7 +133,7 @@ export default function StudentAccountPage() {
             <i className="fa-solid fa-graduation-cap"></i>
           </div>
           <div className="student-navbar-brand-text">
-            <span className="student-navbar-title">2TOTAL</span>
+            <span className="student-navbar-title">TOTAL</span>
             <span className="student-navbar-sub">بوابة الطالب</span>
           </div>
         </div>
@@ -223,7 +244,10 @@ export default function StudentAccountPage() {
                   يسعدنا وجودك معنا يا{" "}
                   <strong>{firstName}</strong> 🎉
                 </p>
-
+                <p className="student-welcome-desc">
+                  هنا تجد كل ما يخص رحلتك الدراسية في مكان واحد.
+                  استمر في التميز!
+                </p>
               </div>
 
               {/* Illustration side */}
@@ -247,7 +271,7 @@ export default function StudentAccountPage() {
                   <div>
                     <h3 className="student-code-card-title">كود الطالب</h3>
                     <p className="student-code-card-sub">
-                      كودك الشخصي في سنتر TOTAL
+                      كودك الشخصي في سنتر 2TOTAL
                     </p>
                   </div>
                 </div>
@@ -271,23 +295,6 @@ export default function StudentAccountPage() {
                       <span>نسخ الكود</span>
                     </>
                   )}
-                </button>
-                <button
-                  type="button"
-                  className="popup-btn"
-                  onClick={() => {
-                    const phone = student.studentPhone.replace(/^0/, "20");
-
-                    const message = `مرحباً *${student.name}* \n\nكود الطالب الخاص بك هو: *${student.code}*`;
-
-                    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-
-                    window.open(whatsappUrl, "_blank");
-                  }}
-                  style={{ backgroundColor: "#25D366" }}
-                >
-                  <i className="fa-brands fa-whatsapp"></i>
-                  <span>إرسال الكود عبر واتساب</span>
                 </button>
 
                 <p className="student-code-hint">
@@ -345,7 +352,7 @@ export default function StudentAccountPage() {
                     </div>
                     <div className="student-profile-info-content">
                       <span className="student-profile-info-label">
-                        رقم الطالب
+                        رقم الواتساب
                       </span>
                       <span
                         className="student-profile-info-value"
@@ -399,6 +406,77 @@ export default function StudentAccountPage() {
                   })}
                 </p>
               </div>
+
+              {/* ── Teacher Schedules Accordion ─────────────────── */}
+              <div className="sched-accordion" style={{ gridColumn: "1 / -1" }}>
+                <button
+                  className="sched-accordion-trigger"
+                  onClick={() => setSchedOpen(o => !o)}
+                  aria-expanded={schedOpen}
+                >
+                  <span className="sched-accordion-title">
+                    <span className="sched-accordion-icon-box">
+                      <i className="fa-solid fa-calendar-days"></i>
+                    </span>
+                    جداول المعلمين — {student.grade}
+                  </span>
+                  <span className={`sched-accordion-chevron ${schedOpen ? "sched-accordion-chevron--open" : ""}`}>
+                    <i className="fa-solid fa-chevron-down"></i>
+                  </span>
+                </button>
+
+                <div className={`sched-accordion-body ${schedOpen ? "sched-accordion-body--open" : ""}`}>
+                  {schedules.length === 0 ? (
+                    <p className="sched-empty">لا توجد جداول متاحة لصفك الدراسي حالياً.</p>
+                  ) : (
+                    <div className="sched-images">
+                      {schedules.map((s) => (
+                        <div key={s._id} className="sched-image-item">
+                          <img
+                            src={s.imageUrl}
+                            alt={`جدول ${s.grade}`}
+                            className="sched-image"
+                            onClick={() => { setViewerImage(s.imageUrl); setViewerZoom(1); }}
+                          />
+                          <button
+                            className="sched-view-btn"
+                            onClick={() => { setViewerImage(s.imageUrl); setViewerZoom(1); }}
+                          >
+                            <i className="fa-solid fa-expand"></i>
+                            <span>عرض بالحجم الكامل</span>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* ── Image Viewer Modal ──────────────────────────────── */}
+              {viewerImage && (
+                <div className="sched-viewer-overlay" onClick={() => setViewerImage("")}>
+                  <div className="sched-viewer-toolbar" onClick={e => e.stopPropagation()}>
+                    <button className="sched-viewer-btn" onClick={() => setViewerZoom(z => Math.min(z + 0.25, 4))} title="تكبير">
+                      <i className="fa-solid fa-magnifying-glass-plus"></i>
+                    </button>
+                    <span className="sched-viewer-zoom-label">{Math.round(viewerZoom * 100)}%</span>
+                    <button className="sched-viewer-btn" onClick={() => setViewerZoom(z => Math.max(z - 0.25, 0.5))} title="تصغير">
+                      <i className="fa-solid fa-magnifying-glass-minus"></i>
+                    </button>
+                    <button className="sched-viewer-btn sched-viewer-btn--close" onClick={() => setViewerImage("")} title="إغلاق">
+                      <i className="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                  <div className="sched-viewer-scroll" onClick={e => e.stopPropagation()}>
+                    <img
+                      src={viewerImage}
+                      alt="جدول المعلم"
+                      className="sched-viewer-img"
+                      style={{ transform: `scale(${viewerZoom})` }}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* ── Locked feature cards (coming soon) ─────────── */}
               <div className="student-locked-card">

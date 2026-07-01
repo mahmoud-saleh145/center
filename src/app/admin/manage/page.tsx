@@ -52,8 +52,8 @@ export default function AdminManagement() {
     const icon = type === "success"
       ? '<i class="fa-solid fa-circle-check"></i>'
       : type === "error"
-      ? '<i class="fa-solid fa-triangle-exclamation"></i>'
-      : '<i class="fa-solid fa-circle-info"></i>';
+        ? '<i class="fa-solid fa-triangle-exclamation"></i>'
+        : '<i class="fa-solid fa-circle-info"></i>';
     toast.innerHTML = `${icon} <span>${msg}</span>`;
     document.body.appendChild(toast);
     setTimeout(() => {
@@ -234,6 +234,11 @@ export default function AdminManagement() {
             <li className="menu-item">
               <Link href="/admin/dashboard" className="menu-link">
                 <i className="fa-solid fa-user-group"></i><span>الطلاب</span>
+              </Link>
+            </li>
+            <li className="menu-item">
+              <Link href="/admin/schedules" className="menu-link">
+                <i className="fa-solid fa-calendar-days"></i><span>الجداول</span>
               </Link>
             </li>
             <li className="menu-item">

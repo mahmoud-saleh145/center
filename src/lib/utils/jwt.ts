@@ -55,7 +55,7 @@ export async function signStudentToken(
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("30d")
+    .setExpirationTime("60d")
     .sign(SECRET);
 }
 

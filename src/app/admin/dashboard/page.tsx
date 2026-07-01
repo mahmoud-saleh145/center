@@ -285,6 +285,11 @@ export default function StudentDashboard() {
               </a>
             </li>
             <li className="menu-item">
+              <Link href="/admin/schedules" className="menu-link">
+                <i className="fa-solid fa-calendar-days"></i><span>الجداول</span>
+              </Link>
+            </li>
+            <li className="menu-item">
               <a href="#" className="menu-link" onClick={(e) => { e.preventDefault(); showToast("صفحة التقارير قيد التطوير قريباً", "info"); }}>
                 <i className="fa-solid fa-chart-simple"></i><span>التقارير</span>
               </a>

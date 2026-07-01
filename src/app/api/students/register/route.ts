@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { createStudent } from "@/lib/services/studentService";
 import { validateStudentInput } from "@/lib/utils/validation";
 import { apiSuccess, apiError } from "@/lib/utils/response";
-import { Grade } from "@/lib/models/Student";
+import { Grade } from "@/lib/constants/grades";
 
 export async function POST(req: NextRequest) {
   try {

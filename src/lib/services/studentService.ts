@@ -1,6 +1,8 @@
 import { connectDB } from "@/lib/db/mongoose";
-import Student, { IStudent, Grade } from "@/lib/models/Student";
+import Student, { IStudent } from "@/lib/models/Student";
+
 import Counter from "@/lib/models/Counter";
+import { Grade } from "../constants/grades";
 
 // ---------------------------------------------------------------------------
 // Universal student code generation — A0001 … A9999 → B0001 … B9999 → …
