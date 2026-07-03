@@ -121,9 +121,29 @@ export default function StudentRegistration() {
         return;
       }
 
+      const loginRes = await fetch("/api/student/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: studentName.trim(),
+          phone: studentPhone.trim(),
+        }),
+      });
+
+      const loginJson = await loginRes.json();
+
+      if (!loginRes.ok || !loginJson.success) {
+        showToast("تم التسجيل ولكن تعذر تسجيل الدخول تلقائياً.", "error");
+        return;
+      }
+
       setGeneratedCode(json.data.code);
       setRegisteredName(json.data.name);
       setShowSuccessPopup(true);
+
     } catch {
       showToast("تعذر الاتصال بالخادم. تحقق من اتصالك.", "error");
     } finally {
@@ -131,12 +151,12 @@ export default function StudentRegistration() {
     }
   };
 
-  const copyStudentCode = () => {
-    navigator.clipboard.writeText(generatedCode).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    });
-  };
+  // const copyStudentCode = () => {
+  //   navigator.clipboard.writeText(generatedCode).then(() => {
+  //     setCopied(true);
+  //     setTimeout(() => setCopied(false), 2500);
+  //   });
+  // };
 
   const resetForm = () => {
     setShowSuccessPopup(false);
@@ -361,7 +381,7 @@ export default function StudentRegistration() {
           </button>
         </form>
         <Link
-          href="/student/login"
+          href="/student/account"
 
           style={{ marginTop: "12px", color: "#5820cc", textDecoration: "underline", textAlign: "center", display: "block" }}
         >
@@ -395,18 +415,7 @@ export default function StudentRegistration() {
                 <span className="popup-info-value code-value">{generatedCode}</span>
               </div>
             </div>
-            <button
-              type="button"
-              className="popup-btn"
-              onClick={copyStudentCode}
-              style={copied ? { backgroundColor: "#10b981", boxShadow: "0 4px 12px rgba(16,185,129,0.3)" } : {}}
-            >
-              {copied ? (
-                <><i className="fa-solid fa-circle-check"></i><span>تم النسخ بنجاح!</span></>
-              ) : (
-                <><i className="fa-regular fa-copy"></i><span>نسخ الكود</span></>
-              )}
-            </button>
+
             <button
               type="button"
               className="popup-btn"
@@ -425,12 +434,12 @@ export default function StudentRegistration() {
               <span>إرسال الكود عبر واتساب</span>
             </button>
             <Link
-              href="/student/login"
+              href="/student/account"
               type="button"
               className="popup-btn"
               style={{ marginTop: "12px", backgroundColor: "#5820cc" }}
             >
-              <span>تسجيل الدخول</span>
+              <span>تابع للصفحة الرئيسية</span>
             </Link>
           </div>
         </div>

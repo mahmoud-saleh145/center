@@ -238,7 +238,7 @@ export default function StudentAccountPage() {
               <div className="student-welcome-text">
                 <p className="student-welcome-sub">أهلاً بك في</p>
                 <h1 className="student-welcome-title">
-                  مركز <span className="student-welcome-highlight">2TOTAL</span>
+                  مركز <span className="student-welcome-highlight">TOTAL</span>
                 </h1>
                 <p className="student-welcome-greeting">
                   يسعدنا وجودك معنا يا{" "}
@@ -295,6 +295,23 @@ export default function StudentAccountPage() {
                       <span>نسخ الكود</span>
                     </>
                   )}
+                </button>
+                <button
+                  type="button"
+                  className="popup-btn"
+                  onClick={() => {
+                    const phone = student.studentPhone.replace(/^0/, "20");
+
+                    const message = `مرحباً *${student.name}* \n\nكود الطالب الخاص بك هو: *${student.code}*`;
+
+                    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+                    window.open(whatsappUrl, "_blank");
+                  }}
+                  style={{ backgroundColor: "#25D366" }}
+                >
+                  <i className="fa-brands fa-whatsapp"></i>
+                  <span>إرسال الكود عبر واتساب</span>
                 </button>
 
                 <p className="student-code-hint">
