@@ -174,7 +174,7 @@ export default function StudentRegistration() {
     setTrack("");
   };
 
-  return (<>
+  return (
     <div className="register-body min-h-screen ">
       <div className="register-card">
         <i className="fa-solid fa-book-open card-watermark"></i>
@@ -450,6 +450,6 @@ export default function StudentRegistration() {
         <p>تصميم وبرمجة <a href="https://wa.me/201015508532" target="_blank" rel="noopener noreferrer" >Developers</a></p>
       </div>
     </div>
-  </>
+
   );
 }

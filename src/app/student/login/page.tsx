@@ -171,9 +171,10 @@ export default function StudentLoginPage() {
       </div>
 
       {/* Footer */}
-      <footer className="student-login-footer">
-        2TOTAL KNOWLEDGE CENTER © {new Date().getFullYear()}
-      </footer>
+      <div className="footer">
+        <p>جميع الحقوق محفوظة © 2026</p>
+        <p>تصميم وبرمجة <a href="https://wa.me/201015508532" target="_blank" rel="noopener noreferrer" >Developers</a></p>
+      </div>
 
       {/* Back link */}
       <Link href="/" className="student-login-back">

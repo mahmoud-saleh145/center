@@ -1727,6 +1727,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     background-color: #0f172a;
     background-image: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(88, 32, 204, 0.25) 0%, transparent 60%),
         radial-gradient(ellipse 60% 50% at 80% 90%, rgba(37, 99, 235, 0.2) 0%, transparent 55%),

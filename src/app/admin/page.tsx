@@ -152,6 +152,7 @@ export default function AdminLogin() {
         </Link>
       </div>
 
+
       <style jsx global>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
@@ -160,6 +161,11 @@ export default function AdminLogin() {
         }
         .shake-animation { animation: shake 0.4s ease-in-out; }
       `}</style>
+
+      <div className="footer">
+        <p>جميع الحقوق محفوظة © 2026</p>
+        <p>تصميم وبرمجة <a href="https://wa.me/201015508532" target="_blank" rel="noopener noreferrer" >Developers</a></p>
+      </div>
     </div>
   );
 }

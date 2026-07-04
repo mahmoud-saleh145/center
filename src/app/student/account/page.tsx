@@ -534,6 +534,11 @@ export default function StudentAccountPage() {
                   <i className="fa-solid fa-lock"></i> قريباً
                 </span>
               </div>
+
+            </div>
+            <div className="footer">
+              <p>جميع الحقوق محفوظة © 2026</p>
+              <p>تصميم وبرمجة <a href="https://wa.me/201015508532" target="_blank" rel="noopener noreferrer" >Developers</a></p>
             </div>
           </>
         ) : (

@@ -421,6 +421,10 @@ export default function AdminManagement() {
             </div>
           </div>
         </section>
+        <div className="footer">
+          <p>جميع الحقوق محفوظة © 2026</p>
+          <p>تصميم وبرمجة <a href="https://wa.me/201015508532" target="_blank" rel="noopener noreferrer" >Developers</a></p>
+        </div>
       </main>
 
       {/* ADD ADMIN MODAL */}
@@ -572,6 +576,7 @@ export default function AdminManagement() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
