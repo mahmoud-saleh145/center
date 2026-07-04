@@ -65,6 +65,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     padding: 40px 20px;
     position: relative;
     overflow: hidden;
@@ -3624,6 +3625,13 @@ button.student-navbar-back-btn {
     }
 }
 
-a {
+/* a {
     text-decoration: none;
+} */
+
+.footer {
+    padding-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #6c757d;
 }
