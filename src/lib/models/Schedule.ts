@@ -2,9 +2,9 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 import { ALL_GRADES, Grade } from "@/lib/constants/grades";
 
 export interface ISchedule extends Document {
-  grade: Grade;           // academic year / grade this schedule belongs to
-  imageUrl: string;       // public URL path e.g. /uploads/schedules/filename.jpg
-  filename: string;       // stored filename for deletion
+  grade: Grade;
+  imageUrl: string;  // Cloudinary secure_url
+  publicId: string;  // Cloudinary public_id — used for deletion
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,7 +22,7 @@ const scheduleSchema = new Schema<ISchedule>(
       required: true,
       trim: true,
     },
-    filename: {
+    publicId: {
       type: String,
       required: true,
       trim: true,

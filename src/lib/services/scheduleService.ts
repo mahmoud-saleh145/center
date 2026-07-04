@@ -1,36 +1,39 @@
+// src/lib/services/scheduleService.ts
 import { connectDB } from "@/lib/db/mongoose";
 import Schedule from "@/lib/models/Schedule";
-import fs from "fs/promises";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
 import { Grade } from "../constants/grades";
 
-// Public uploads directory — served as static files via /uploads/schedules/...
-const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads", "schedules");
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-// Ensure the directory exists on first use
-async function ensureDir() {
-  await fs.mkdir(UPLOADS_DIR, { recursive: true });
-}
-
-export async function saveScheduleImage(
-  file: File,
-  grade: Grade
-) {
+export async function saveScheduleImage(file: File, grade: Grade) {
   await connectDB();
-  await ensureDir();
 
-  // Build a unique filename: timestamp + sanitised original name
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-  const filename = `schedule_${Date.now()}.${ext}`;
-  const filepath = path.join(UPLOADS_DIR, filename);
-
-  // Write buffer to disk
   const buffer = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(filepath, buffer);
 
-  const imageUrl = `/uploads/schedules/${filename}`;
+  const uploaded = await new Promise<{ secure_url: string; public_id: string }>(
+    (resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "2total/schedules", resource_type: "image" },
+        (error, result) => {
+          if (error || !result) return reject(error ?? new Error("Cloudinary upload failed"));
+          resolve({ secure_url: result.secure_url, public_id: result.public_id });
+        }
+      );
+      stream.end(buffer);
+    }
+  );
 
-  const schedule = await Schedule.create({ grade, imageUrl, filename });
+  const schedule = await Schedule.create({
+    grade,
+    imageUrl: uploaded.secure_url,
+    publicId: uploaded.public_id,
+  });
+
   return schedule;
 }
 
@@ -49,12 +52,10 @@ export async function deleteSchedule(id: string) {
   const schedule = await Schedule.findByIdAndDelete(id);
   if (!schedule) throw new Error("الجدول غير موجود.");
 
-  // Delete file from disk — silent if already missing
   try {
-    const filepath = path.join(UPLOADS_DIR, schedule.filename);
-    await fs.unlink(filepath);
+    await cloudinary.uploader.destroy(schedule.publicId);
   } catch {
-    // file may already be gone — not a fatal error
+    // Cloudinary deletion failure is non-fatal — record is already removed from DB
   }
 
   return schedule;
