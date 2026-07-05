@@ -451,6 +451,21 @@ export default function StudentDashboard() {
                           <button className="action-btn btn-delete" title="حذف" onClick={() => handleDeleteStudent(student)}>
                             <i className="fa-solid fa-trash-can"></i>
                           </button>
+                          <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => {
+                              const phone = student.studentPhone.replace(/^0/, "20");
+
+                              const whatsappUrl = `https://wa.me/${phone}`;
+
+                              window.open(whatsappUrl, "_blank");
+                            }}
+                            style={{ backgroundColor: "#25D366" }}
+                          >
+                            <i className="fa-brands fa-whatsapp"></i>
+                            <span style={{ fontSize: "8px" }}> </span>
+                          </button>
                         </div>
                       </td>
                     </tr>
