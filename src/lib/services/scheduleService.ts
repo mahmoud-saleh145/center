@@ -24,6 +24,7 @@ export async function saveScheduleImage(file: File, grade: Grade) {
           resolve({ secure_url: result.secure_url, public_id: result.public_id });
         }
       );
+
       stream.end(buffer);
     }
   );

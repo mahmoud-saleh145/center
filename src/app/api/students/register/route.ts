@@ -7,6 +7,11 @@ import { Grade } from "@/lib/constants/grades";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    const ip =
+      (req.headers.get("x-forwarded-for") ?? "")
+        .split(",")[0]
+        .trim() || "unknown";
+    const userAgent = req.headers.get("user-agent") ?? "";
 
     const errors = validateStudentInput(body);
     if (errors.length > 0) {
@@ -23,6 +28,8 @@ export async function POST(req: NextRequest) {
       school: String(body.school).trim(),
       parentJob: String(body.parentJob).trim(),
       createdBy: "student",
+      ip,
+      userAgent,
     });
 
     return apiSuccess({ code: student.code, name: student.name }, 201);

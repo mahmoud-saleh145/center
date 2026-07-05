@@ -56,6 +56,8 @@ export interface CreateStudentDTO {
   school: string;
   parentJob: string;
   createdBy: "student" | "admin";
+  ip: string;
+  userAgent: string;
 }
 
 export interface StudentFilters {

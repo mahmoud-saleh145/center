@@ -2,6 +2,7 @@ import { ALL_GRADES, SECONDARY_2_TRACKS, SECONDARY_3_TRACKS } from "../constants
 
 const EG_PHONE = /^01[0125]\d{8}$/;
 const QUADRUPLE_NAME = /^\S+(\s+\S+){3,}/;
+const NAME_REGEX = /^[\p{L}\p{M}\s.'-]+$/u;
 
 const VALID_GRADES = new Set<string>(ALL_GRADES);
 const S2_TRACKS = new Set<string>(SECONDARY_2_TRACKS);
@@ -13,6 +14,10 @@ export function validateStudentInput(body: Record<string, unknown>) {
   // Name — at least 4 words
   if (!body.name || !QUADRUPLE_NAME.test(String(body.name).trim())) {
     errors.push("يرجى إدخال الاسم رباعياً على الأقل (4 كلمات).");
+  }
+  // Name — only letters, spaces, and certain punctuation
+  else if (!NAME_REGEX.test(String(body.name).trim())) {
+    errors.push("الاسم يحتوي على أحرف غير صالحة.");
   }
 
   // Gender

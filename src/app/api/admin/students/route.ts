@@ -31,6 +31,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
+    const ip =
+      (req.headers.get("x-forwarded-for") ?? "")
+        .split(",")[0]
+        .trim() || "unknown";
+    const userAgent = req.headers.get("user-agent") ?? "";
 
     const errors = validateStudentInput(body);
     if (errors.length > 0) return apiError(errors[0], 422);
@@ -45,6 +50,8 @@ export async function POST(req: NextRequest) {
       grade: String(body.grade).trim() as Grade,
       track: body.track ? String(body.track).trim() : "",
       createdBy: "student",
+      ip,
+      userAgent,
     });
 
     return apiSuccess(student, 201);

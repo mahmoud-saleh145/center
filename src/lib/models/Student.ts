@@ -27,8 +27,11 @@ export interface IStudent extends Document {
   school: string;
   parentJob: string;
   createdBy: "student" | "admin";
+  ip: string;
+  userAgent: string;
   createdAt: Date;
   updatedAt: Date;
+
 }
 
 // ---------------------------------------------------------------------------
@@ -63,9 +66,6 @@ const studentSchema = new Schema<IStudent>(
       type: String,
       trim: true,
       default: "",
-      // Not required at schema level — conditional requirement is
-      // enforced in the service layer and validation utility so that
-      // grades without tracks can correctly store an empty string.
     },
     studentPhone: {
       type: String,
@@ -94,6 +94,17 @@ const studentSchema = new Schema<IStudent>(
       required: true,
       enum: ["student", "admin"],
       default: "student",
+    },
+    ip: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    userAgent: {
+      type: String,
+      default: "",
+      trim: true,
     },
   },
   { timestamps: true }
