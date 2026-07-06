@@ -10,31 +10,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function saveScheduleImage(file: File, grade: Grade) {
+// Called after the frontend has already uploaded directly to Cloudinary.
+// Only saves the resulting URL and publicId to MongoDB.
+export async function saveScheduleRecord(
+  grade: Grade,
+  imageUrl: string,
+  publicId: string
+) {
   await connectDB();
-
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  const uploaded = await new Promise<{ secure_url: string; public_id: string }>(
-    (resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "2total/schedules", resource_type: "image" },
-        (error, result) => {
-          if (error || !result) return reject(error ?? new Error("Cloudinary upload failed"));
-          resolve({ secure_url: result.secure_url, public_id: result.public_id });
-        }
-      );
-
-      stream.end(buffer);
-    }
-  );
-
-  const schedule = await Schedule.create({
-    grade,
-    imageUrl: uploaded.secure_url,
-    publicId: uploaded.public_id,
-  });
-
+  const schedule = await Schedule.create({ grade, imageUrl, publicId });
   return schedule;
 }
 
@@ -56,7 +40,7 @@ export async function deleteSchedule(id: string) {
   try {
     await cloudinary.uploader.destroy(schedule.publicId);
   } catch {
-    // Cloudinary deletion failure is non-fatal — record is already removed from DB
+    // Non-fatal — record is already removed from DB
   }
 
   return schedule;

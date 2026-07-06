@@ -1,3 +1,4 @@
+// src/app/admin/schedules/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -9,7 +10,7 @@ interface Schedule {
   _id: string;
   grade: string;
   imageUrl: string;
-  filename: string;
+  publicId: string;
   createdAt: string;
 }
 
@@ -24,6 +25,7 @@ export default function AdminSchedulesPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<"idle" | "signing" | "uploading" | "saving">("idle");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filter
@@ -88,43 +90,98 @@ export default function AdminSchedulesPage() {
     const file = e.target.files?.[0] ?? null;
     setSelectedFile(file);
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      setPreviewUrl(URL.createObjectURL(file));
     } else {
       setPreviewUrl("");
     }
   };
 
+  const resetForm = () => {
+    setSelectedFile(null);
+    setSelectedGrade("");
+    setPreviewUrl("");
+    setUploadProgress("idle");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!selectedFile || !selectedGrade) {
       showToast("يرجى اختيار الصف والصورة.", "error");
       return;
     }
 
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    const MAX_SIZE_MB = 10;
+    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+      showToast("صيغة الصورة غير مدعومة. يُسمح بـ JPG, PNG, WebP, GIF فقط.", "error");
+      return;
+    }
+    if (selectedFile.size > MAX_SIZE_MB * 1024 * 1024) {
+      showToast(`حجم الصورة يجب أن لا يتجاوز ${MAX_SIZE_MB}MB.`, "error");
+      return;
+    }
+
     setUploadLoading(true);
+
     try {
-      const fd = new FormData();
-      fd.append("image", selectedFile);
-      fd.append("grade", selectedGrade);
-
-      const res = await fetch("/api/admin/schedules", { method: "POST", body: fd });
-      const json = await res.json();
-
-      if (!res.ok || !json.success) {
-        showToast(json.message ?? "خطأ في الرفع.", "error");
+      // Step 1 — Get signed upload params from our API
+      setUploadProgress("signing");
+      const signRes = await fetch("/api/admin/schedules/sign");
+      const signJson = await signRes.json();
+      if (!signRes.ok || !signJson.success) {
+        showToast(signJson.message ?? "فشل توليد التوقيع.", "error");
         return;
       }
+      const { signature, timestamp, folder, cloudName, apiKey } = signJson.data;
+
+      // Step 2 — Upload directly to Cloudinary from the browser
+      setUploadProgress("uploading");
+      const cloudFd = new FormData();
+      cloudFd.append("file", selectedFile);
+      cloudFd.append("api_key", apiKey);
+      cloudFd.append("timestamp", String(timestamp));
+      cloudFd.append("signature", signature);
+      cloudFd.append("folder", folder);
+
+      const cloudRes = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        { method: "POST", body: cloudFd }
+      );
+      const cloudJson = await cloudRes.json();
+
+      if (!cloudRes.ok || !cloudJson.secure_url) {
+        showToast("فشل رفع الصورة إلى Cloudinary.", "error");
+        return;
+      }
+
+      // Step 3 — Save imageUrl + publicId to MongoDB via our API
+      setUploadProgress("saving");
+      const saveRes = await fetch("/api/admin/schedules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          grade: selectedGrade,
+          imageUrl: cloudJson.secure_url,
+          publicId: cloudJson.public_id,
+        }),
+      });
+      const saveJson = await saveRes.json();
+
+      if (!saveRes.ok || !saveJson.success) {
+        showToast(saveJson.message ?? "خطأ في حفظ الجدول.", "error");
+        return;
+      }
+
       showToast("تم رفع الجدول بنجاح!", "success");
-      setSelectedFile(null);
-      setSelectedGrade("");
-      setPreviewUrl("");
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      resetForm();
       fetchSchedules();
     } catch {
       showToast("تعذر الاتصال بالخادم.", "error");
     } finally {
       setUploadLoading(false);
+      setUploadProgress("idle");
     }
   };
 
@@ -141,13 +198,18 @@ export default function AdminSchedulesPage() {
     }
   };
 
+  const progressLabel: Record<string, string> = {
+    signing: "جاري التوقيع...",
+    uploading: "جاري الرفع إلى Cloudinary...",
+    saving: "جاري الحفظ...",
+  };
+
   const filtered = filterGrade === "all"
     ? schedules
     : schedules.filter(s => s.grade === filterGrade);
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar — identical pattern to admin dashboard */}
       <aside className="sidebar">
         <div className="sidebar-top">
           <div className="sidebar-logo">
@@ -191,7 +253,6 @@ export default function AdminSchedulesPage() {
       </aside>
 
       <main className="main-content">
-        {/* Header */}
         <header className="dashboard-header">
           <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
             <h2 style={{ fontSize: "20px", fontWeight: "800", color: "var(--royal-blue)" }}>
@@ -207,8 +268,11 @@ export default function AdminSchedulesPage() {
                 <span className="profile-name">{adminUser.name}</span>
                 <span className="profile-role">{adminUser.role}</span>
               </div>
-              <i className="fa-solid fa-circle-user" style={{ fontSize: "30px", color: "var(--primary-color)" }}></i>
-
+              <img
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt="Admin"
+                className="profile-avatar"
+              />
             </div>
           </div>
         </header>
@@ -233,6 +297,7 @@ export default function AdminSchedulesPage() {
                     required
                     value={selectedGrade}
                     onChange={(e) => setSelectedGrade(e.target.value)}
+                    disabled={uploadLoading}
                   >
                     <option value="" disabled>اختر الصف...</option>
                     {ALL_GRADES.map(g => <option key={g} value={g}>{g}</option>)}
@@ -252,6 +317,7 @@ export default function AdminSchedulesPage() {
                     className="sched-file-input"
                     onChange={handleFileChange}
                     required
+                    disabled={uploadLoading}
                   />
                   <div className="sched-file-label">
                     {selectedFile ? (
@@ -271,11 +337,23 @@ export default function AdminSchedulesPage() {
               </div>
             )}
 
-            <button type="submit" className="modal-save-btn" style={{ maxWidth: "220px" }} disabled={uploadLoading}>
-              {uploadLoading
-                ? <><i className="fa-solid fa-spinner fa-spin"></i><span>جاري الرفع...</span></>
-                : <><i className="fa-solid fa-cloud-arrow-up"></i><span>رفع الجدول</span></>
-              }
+            <button
+              type="submit"
+              className="modal-save-btn"
+              style={{ maxWidth: "260px" }}
+              disabled={uploadLoading}
+            >
+              {uploadLoading ? (
+                <>
+                  <i className="fa-solid fa-spinner fa-spin"></i>
+                  <span>{progressLabel[uploadProgress] ?? "جاري المعالجة..."}</span>
+                </>
+              ) : (
+                <>
+                  <i className="fa-solid fa-cloud-arrow-up"></i>
+                  <span>رفع الجدول</span>
+                </>
+              )}
             </button>
           </form>
         </section>

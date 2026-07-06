@@ -26,6 +26,7 @@ export async function requireAdmin(
     );
   }
 
+
   return payload;
 }
 
