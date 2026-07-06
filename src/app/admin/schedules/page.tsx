@@ -268,11 +268,7 @@ export default function AdminSchedulesPage() {
                 <span className="profile-name">{adminUser.name}</span>
                 <span className="profile-role">{adminUser.role}</span>
               </div>
-              <img
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt="Admin"
-                className="profile-avatar"
-              />
+              <i className="fa-solid fa-circle-user" style={{ fontSize: "30px", color: "var(--primary-color)" }}></i>
             </div>
           </div>
         </header>
