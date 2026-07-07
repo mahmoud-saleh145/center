@@ -6,6 +6,8 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 import {
   ALL_GRADES,
   Grade,
+  Branch,
+  ALL_BRANCHES,
 } from "@/lib/constants/grades";
 
 
@@ -22,6 +24,7 @@ export interface IStudent extends Document {
   gender: "ذكر" | "أنثى";
   grade: Grade;
   track: string; // "" for grades that have no track; required value for تانية/تالتة ثانوي
+  branch: Branch;
   studentPhone: string;
   parentPhone: string;
   school: string;
@@ -66,6 +69,14 @@ const studentSchema = new Schema<IStudent>(
       type: String,
       trim: true,
       default: "",
+    },
+    branch: {
+      type: String,
+      required: false,
+      trim: true,
+      enum: [...ALL_BRANCHES],
+      default: "غير محدد",
+
     },
     studentPhone: {
       type: String,
