@@ -76,14 +76,12 @@ export async function createStudent(dto: CreateStudentDTO): Promise<IStudent> {
   await connectDB();
 
   // Prevent duplicate registration by phone number
-  // const existing = await Student.findOne({
-  //   $or: [
-  //     { studentPhone: dto.studentPhone }
-  //   ],
-  // });
   const existing = await Student.findOne({
-    name: dto.name,
+    studentPhone: dto.studentPhone
   });
+  // const existing = await Student.findOne({
+  //   name: dto.name,
+  // });
 
 
   if (existing) {
@@ -92,6 +90,7 @@ export async function createStudent(dto: CreateStudentDTO): Promise<IStudent> {
 
   const code = await generateStudentCode();
   const student = new Student({ ...dto, code });
+  console.log(student);
   await student.save();
   return student;
 }
