@@ -76,11 +76,15 @@ export async function createStudent(dto: CreateStudentDTO): Promise<IStudent> {
   await connectDB();
 
   // Prevent duplicate registration by phone number
+  // const existing = await Student.findOne({
+  //   $or: [
+  //     { studentPhone: dto.studentPhone }
+  //   ],
+  // });
   const existing = await Student.findOne({
-    $or: [
-      { studentPhone: dto.studentPhone }
-    ],
+    name: dto.name,
   });
+
 
   if (existing) {
     throw new Error("هذا الطالب مسجل مسبقاً في النظام.");
