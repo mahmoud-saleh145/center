@@ -71,6 +71,7 @@ const studentSchema = new Schema<IStudent>(
       type: String,
       required: true,
       trim: true,
+      unique: true,
       match: [/^01[0125]\d{8}$/, "رقم هاتف الطالب غير صحيح"],
     },
     parentPhone: {

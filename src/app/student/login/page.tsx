@@ -161,9 +161,7 @@ export default function StudentLoginPage() {
         <p className="student-login-help">
           واجهت مشكلة؟{" "}
           <a
-            href="#"
-            className="student-login-help-link"
-            onClick={(e) => e.preventDefault()}
+            href="https://wa.me/201040707499" target="_blank" rel="noopener noreferrer"
           >
             تواصل مع الدعم الفني
           </a>

@@ -3,7 +3,22 @@ import { requireAdmin } from "@/lib/middleware/auth";
 import { getAllStudentsForExport } from "@/lib/services/studentService";
 import * as XLSX from "xlsx-js-style";
 import { connectDB } from "@/lib/db/mongoose";
+const gradeMap: Record<string, string> = {
+  "3 ابتدائي": "3ب",
+  "4 ابتدائي": "4ب",
+  "5 ابتدائي": "5ب",
+  "6 ابتدائي": "6ب",
 
+  "أولى إعدادي": "1ع",
+  "تانية إعدادي": "2ع",
+  "تالتة إعدادي": "3ع",
+
+  "أولى ثانوي": "1ث",
+  "تانية ثانوي": "2ث",
+  "تالتة ثانوي": "3ث",
+};
+
+const formatGrade = (grade: string) => gradeMap[grade] ?? grade;
 export async function GET(req: NextRequest) {
   await connectDB();
   const auth = await requireAdmin(req);
@@ -17,13 +32,16 @@ export async function GET(req: NextRequest) {
         ? gender
         : undefined
     );
+    console.log(students);
+
     const rows = students.map((s) => ({
       "وظيفه ولي الأمر": s.parentJob,
       مدرسه: s.school,
       " تليفون الطالب": s.studentPhone,
       "تليفون ولي الأمر": s.parentPhone,
       الشعبه: s.track || "-",
-      الصف: s.grade,
+      الصف: formatGrade(s.grade),
+      النوع: s.gender,
       "الاسم ثلاثي": s.name,
       "كود ": s.code,
     }));
@@ -34,12 +52,13 @@ export async function GET(req: NextRequest) {
     (ws as any)["!rtl"] = true;
     // عرض الأعمدة
     ws["!cols"] = [
-      { wch: 15 }, // وظيفة ولي الأمر
-      { wch: 10 }, // المدرسة
+      { wch: 18 }, // وظيفة ولي الأمر
+      { wch: 15 }, // المدرسة
       { wch: 20 }, // هاتف الطالب
       { wch: 20 }, // هاتف ولي الأمر
-      { wch: 10 }, // شعبة
-      { wch: 10 }, // الصف
+      { wch: 12 }, // شعبة
+      { wch: 8 }, // الصف
+      { wch: 8 }, // النوع
       { wch: 30 }, // الاسم
       { wch: 8 }, // كود الطالب
     ];
@@ -82,7 +101,7 @@ export async function GET(req: NextRequest) {
           color: {
             rgb: "FFFFFF",
           },
-          sz: 14,
+          sz: 12,
         },
         alignment: {
           horizontal: "center",
@@ -119,7 +138,7 @@ export async function GET(req: NextRequest) {
             right: { style: "thin", color: { rgb: "808080" } },
           },
           font: {
-            sz: 12,
+            sz: 10,
           },
         };
       }

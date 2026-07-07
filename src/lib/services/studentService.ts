@@ -75,18 +75,12 @@ export async function createStudent(dto: CreateStudentDTO): Promise<IStudent> {
   await connectDB();
 
   // Prevent duplicate registration by phone number
-  // const existing = await Student.findOne({
-  //   $or: [
-  //     { studentPhone: dto.studentPhone },
-  //     { parentPhone: dto.parentPhone, name: dto.name },
-  //     { parentPhone: dto.parentPhone, name: dto.name },
-  //   ],
-  // });
-
-  const name = dto.name.trim();
   const existing = await Student.findOne({
-    name: { $regex: `^${name}$`, $options: "i" }
+    $or: [
+      { studentPhone: dto.studentPhone }
+    ],
   });
+
   if (existing) {
     throw new Error("هذا الطالب مسجل مسبقاً في النظام.");
   }
