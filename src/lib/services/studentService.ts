@@ -106,7 +106,7 @@ export async function getStudents(filters: StudentFilters) {
     gender = "",
     page = 1,
     limit = 20,
-    sort = "-createdAt",
+    sort = "-code",
   } = filters;
 
   const query: Record<string, unknown> = {};
@@ -183,6 +183,6 @@ export async function getAllStudentsForExport(
   return Student.find(
     gender ? { gender } : {}
   )
-    .sort("-createdAt")
+    .sort("code")
     .lean();
 }

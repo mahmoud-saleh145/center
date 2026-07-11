@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       gender: searchParams.get("gender") ?? "",
       page: Number(searchParams.get("page") ?? 1),
       limit: Number(searchParams.get("limit") ?? 20),
-      sort: searchParams.get("sort") ?? "-createdAt",
+      sort: searchParams.get("sort") ?? "code",
     });
     return apiSuccess(result);
   } catch (err) {
