@@ -90,7 +90,7 @@ export async function createStudent(dto: CreateStudentDTO): Promise<IStudent> {
 
   const code = await generateStudentCode();
   const student = new Student({ ...dto, code });
-  console.log(student);
+
   await student.save();
   return student;
 }
