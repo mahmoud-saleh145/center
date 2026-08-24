@@ -4,16 +4,11 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 // Grade constants — single source of truth
 // ---------------------------------------------------------------------------
 import {
-  ALL_GRADES,
-  Grade,
-  Branch,
   ALL_BRANCHES,
+  ALL_GRADES,
+  Branch,
+  Grade,
 } from "@/lib/constants/grades";
-
-
-// ---------------------------------------------------------------------------
-// Track constants — only relevant for two specific grades
-// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // IStudent interface
@@ -24,11 +19,11 @@ export interface IStudent extends Document {
   gender: "ذكر" | "أنثى";
   grade: Grade;
   track: string; // "" for grades that have no track; required value for تانية/تالتة ثانوي
-  branch: Branch;
   studentPhone: string;
   parentPhone: string;
   school: string;
   parentJob: string;
+  branch: Branch;
   createdBy: "student" | "admin";
   ip: string;
   userAgent: string;
@@ -53,6 +48,7 @@ const studentSchema = new Schema<IStudent>(
       required: true,
       trim: true,
       minlength: 7, // at least 4 Arabic words
+      maxlength: 100,
     },
     gender: {
       type: String,
@@ -72,11 +68,9 @@ const studentSchema = new Schema<IStudent>(
     },
     branch: {
       type: String,
-      required: false,
+      required: true,
       trim: true,
       enum: [...ALL_BRANCHES],
-      default: "غير محدد",
-
     },
     studentPhone: {
       type: String,
@@ -95,11 +89,13 @@ const studentSchema = new Schema<IStudent>(
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     parentJob: {
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     createdBy: {
       type: String,
